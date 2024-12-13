@@ -1,5 +1,7 @@
 package database
 
+// Something something something maybe build tags I am not sure yet...
+
 import (
 	"context"
 	"database/sql"
@@ -7,23 +9,6 @@ import (
 	"log/slog"
 	"slices"
 )
-
-type SQLTable struct {
-	Name   string
-	Schema string
-}
-
-type ConfigureSQLDatabaseOptions struct {
-	CreateTablesIfNecessary bool
-	Tables                  []*SQLTable
-	Pragma                  []string
-}
-
-func DefaultConfigureSQLDatabaseOptions() *ConfigureSQLDatabaseOptions {
-
-	opts := &ConfigureSQLDatabaseOptions{}
-	return opts
-}
 
 func ConfigureSQLDatabase(ctx context.Context, db *sql.DB, opts *ConfigureSQLDatabaseOptions) error {
 
@@ -55,13 +40,13 @@ func ConfigureSQLDatabase(ctx context.Context, db *sql.DB, opts *ConfigureSQLDat
 
 		for _, t := range opts.Tables {
 
-			if slices.Contains(table_names, t.Name) {
+			if slices.Contains(table_names, t.Name()) {
 				continue
 			}
 
-			slog.Debug("Create table", "name", t.Name, "schema", t.Schema)
+			slog.Debug("Create table", "name", t.Name(), "schema", t.Schema())
 
-			_, err := db.ExecContext(ctx, t.Schema)
+			_, err := db.ExecContext(ctx, t.Schema())
 
 			if err != nil {
 				return fmt.Errorf("Failed to create %s table, %w", t.Name, err)
