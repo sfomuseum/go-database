@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"log/slog"
 	"slices"
 )
 
@@ -42,9 +41,13 @@ func configureSQLiteDatabase(ctx context.Context, db *sql.DB, opts *ConfigureSQL
 				continue
 			}
 
-			slog.Debug("Create table", "name", t.Name(), "schema", t.Schema())
+			schema, err := t.Schema(db)
 
-			_, err := db.ExecContext(ctx, t.Schema())
+			if err != nil {
+				return fmt.Errorf("Failed to derive schema for table %s, %w", t.Name(), err)
+			}
+			
+			_, err = db.ExecContext(ctx, schema)
 
 			if err != nil {
 				return fmt.Errorf("Failed to create %s table, %w", t.Name(), err)

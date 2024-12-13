@@ -19,7 +19,7 @@ func init() {
 
 type Table interface {
 	Name() string
-	Schema() string
+	Schema(*sql.DB) (string, error)
 	InitializeTable(context.Context, *sql.DB) error
 	IndexRecord(context.Context, *sql.DB, interface{}) error
 }
@@ -51,7 +51,7 @@ func CreateTableIfNecessary(ctx context.Context, db *sql.DB, t Table) error {
 
 	if create {
 
-		sql := t.Schema()
+		sql, err := t.Schema(db)
 
 		if err != nil {
 			return err
