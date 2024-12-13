@@ -1,4 +1,4 @@
-package database
+package sql
 
 import (
 	"context"
@@ -28,7 +28,7 @@ func HasTable(ctx context.Context, db *sql.DB, table_name string) (bool, error) 
 
 	switch Driver(db) {
 	case SQLITE_DRIVER:
-		return hasSQLiteTable(ctx, db, table_name)
+		return HasSQLiteTable(ctx, db, table_name)
 	default:
 		return false, fmt.Errorf("Unhandled or unsupported database driver %s", DriverTypeOf(db))
 	}
