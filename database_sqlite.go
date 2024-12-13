@@ -1,7 +1,5 @@
 package database
 
-// Something something something maybe build tags I am not sure yet...
-
 import (
 	"context"
 	"database/sql"
@@ -10,7 +8,7 @@ import (
 	"slices"
 )
 
-func ConfigureSQLDatabase(ctx context.Context, db *sql.DB, opts *ConfigureSQLDatabaseOptions) error {
+func configureSQLiteDatabase(ctx context.Context, db *sql.DB, opts *ConfigureSQLDatabaseOptions) error {
 
 	if opts.CreateTablesIfNecessary {
 
@@ -49,7 +47,7 @@ func ConfigureSQLDatabase(ctx context.Context, db *sql.DB, opts *ConfigureSQLDat
 			_, err := db.ExecContext(ctx, t.Schema())
 
 			if err != nil {
-				return fmt.Errorf("Failed to create %s table, %w", t.Name, err)
+				return fmt.Errorf("Failed to create %s table, %w", t.Name(), err)
 			}
 		}
 	}

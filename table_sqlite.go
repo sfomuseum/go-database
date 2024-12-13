@@ -8,7 +8,7 @@ import (
 	"fmt"
 )
 
-func HasTable(ctx context.Context, db *sql.DB, table_name string) (bool, error) {
+func hasSQLiteTable(ctx context.Context, db *sql.DB, table_name string) (bool, error) {
 
 	has_table := false
 

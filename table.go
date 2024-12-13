@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"regexp"
 )
 
@@ -21,6 +22,17 @@ type Table interface {
 	Schema() string
 	InitializeTable(context.Context, *sql.DB) error
 	IndexRecord(context.Context, *sql.DB, interface{}) error
+}
+
+func HasTable(ctx context.Context, db *sql.DB, table_name string) (bool, error) {
+
+	switch Driver(db) {
+	case SQLITE_DRIVER:
+		return hasSQLiteTable(ctx, db, table_name)
+	default:
+		return false, fmt.Errorf("Unhandled or unsupported database driver %s", DriverTypeOf(db))
+	}
+
 }
 
 func CreateTableIfNecessary(ctx context.Context, db *sql.DB, t Table) error {
