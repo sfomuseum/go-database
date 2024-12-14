@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	_ "log/slog"
 )
 
 func ConfigurePostgresDatabase(ctx context.Context, db *sql.DB, opts *ConfigureDatabaseOptions) error {
@@ -43,9 +44,9 @@ func ConfigurePostgresDatabase(ctx context.Context, db *sql.DB, opts *ConfigureD
 
 func HasPostgresTable(ctx context.Context, db *sql.DB, table_name string) (bool, error) {
 
-	sql := "SELECT EXISTS(SELECT * FROM pg_tables WHERE schemaname='public' AND tablename  = '?')"
-
-	row := db.QueryRowContext(ctx, sql, table_name)
+	q := "SELECT EXISTS(SELECT * FROM pg_tables WHERE schemaname='public' AND tablename=$1)"
+	
+	row := db.QueryRowContext(ctx, q, table_name)
 
 	var exists bool
 

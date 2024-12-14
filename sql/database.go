@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"net/url"
+	"log/slog"
 )
 
 type ConfigureDatabaseOptions struct {
@@ -43,6 +44,8 @@ func OpenWithURI(ctx context.Context, db_uri string) (*sql.DB, error) {
 	engine := u.Host
 	dsn := q.Get("dsn")
 
+	slog.Info("Create database connection", "engine", engine, "dsn", dsn)
+	
 	db, err := sql.Open(engine, dsn)
 
 	if err != nil {
