@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"net/url"
-	"log/slog"
+	_ "log/slog"
 )
 
 type ConfigureDatabaseOptions struct {
