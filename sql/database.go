@@ -4,8 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-	"net/url"
 	_ "log/slog"
+	"net/url"
 )
 
 type ConfigureDatabaseOptions struct {
@@ -26,6 +26,8 @@ func ConfigureDatabase(ctx context.Context, db *sql.DB, opts *ConfigureDatabaseO
 		return ConfigureSQLiteDatabase(ctx, db, opts)
 	case POSTGRES_DRIVER:
 		return ConfigurePostgresDatabase(ctx, db, opts)
+	case DUCKDB_DRIVER:
+		return ConfigureDuckDBDatabase(ctx, db, opts)
 	default:
 		return fmt.Errorf("Unhandled or unsupported database driver %s", DriverTypeOf(db))
 	}
