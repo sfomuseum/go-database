@@ -74,16 +74,32 @@ func HasDuckDBTable(ctx context.Context, db *db_sql.DB, table_name string) (bool
 	logger := slog.Default()
 	logger = logger.With("table", table_name)
 
-	q := "SELECT EXISTS(SELECT * FROM pg_tables WHERE schemaname='public' AND tablename=$1)"
+	exists := false
 
-	row := db.QueryRowContext(ctx, q, table_name)
+	// https://duckdb.org/docs/stable/guides/meta/list_tables.html
+	q := "SHOW TABLES"
 
-	var exists bool
-
-	err := row.Scan(&exists)
+	rows, err := db.QueryContext(ctx, q, table_name)
 
 	if err != nil {
-		return false, fmt.Errorf("Failed to query table, %w", err)
+		return false, fmt.Errorf("Failed to show tables, %w", err)
+	}
+
+	defer rows.Close()
+
+	for rows.Next() {
+
+		var db_table string
+		err := rows.Scan(&db_table)
+
+		if err != nil {
+			return false, fmt.Errorf("Failed to scan row, %w", err)
+		}
+
+		if db_table == table_name {
+			exists = true
+			break
+		}
 	}
 
 	logger.Debug("Does table exist", "exists", exists)
