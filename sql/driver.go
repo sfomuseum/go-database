@@ -30,6 +30,8 @@ func Driver(db *sql.DB) string {
 		return POSTGRES_DRIVER
 	case "duckdb.Driver", "*duckdb.Driver":
 		return DUCKDB_DRIVER
+	case "*mysql.MySQLDriver", "mysql.MySQLDriver":
+		return MYSQL_DRIVER
 	default:
 		slog.Warn("Unhandled driver type", "type", driver_type)
 		return ""
