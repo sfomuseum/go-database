@@ -20,4 +20,26 @@ func TestNullDriver(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Null query failed, %v", err)
 	}
+
+	st, err := db.Prepare("SELECT col1 FROM table WHERE value = ?")
+
+	if err != nil {
+		t.Fatalf("Failed to create null statement, %v", err)
+	}
+
+	row := st.QueryRowContext(ctx, st, 1)
+
+	var col1 any
+
+	err = row.Scan(&col1)
+
+	if err != nil {
+		t.Fatalf("Failed to execute query statement, %v", err)
+	}
+
+	err = db.Close()
+
+	if err != nil {
+		t.Fatalf("Failed to close null database, %v", err)
+	}
 }
