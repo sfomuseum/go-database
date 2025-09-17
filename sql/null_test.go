@@ -2,6 +2,7 @@ package sql
 
 import (
 	"context"
+	"database/sql"
 	"testing"
 )
 
@@ -21,20 +22,26 @@ func TestNullDriver(t *testing.T) {
 		t.Fatalf("Null query failed, %v", err)
 	}
 
-	st, err := db.Prepare("SELECT col1 FROM table WHERE value = ?")
+	st, err := db.Prepare("SELECT col FROM table WHERE value = ?")
 
 	if err != nil {
-		t.Fatalf("Failed to create null statement, %v", err)
+		t.Fatalf("Failed to prepare statement, %v", err)
 	}
 
-	row := st.QueryRowContext(ctx, st, 1)
+	row := st.QueryRowContext(ctx, 1)
 
-	var col1 any
+	var col any
 
-	err = row.Scan(&col1)
+	err = row.Scan(&col)
+
+	if err != nil && err != sql.ErrNoRows {
+		t.Fatalf("Failed to execute query statement, %v", err)
+	}
+
+	err = st.Close()
 
 	if err != nil {
-		t.Fatalf("Failed to execute query statement, %v", err)
+		t.Fatalf("Failed to close statement, %v", err)
 	}
 
 	err = db.Close()

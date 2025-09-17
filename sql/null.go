@@ -1,9 +1,11 @@
 package sql
 
 import (
+	"context"
 	"database/sql"
 	"database/sql/driver"
 	"io"
+	"strings"
 )
 
 func init() {
@@ -18,10 +20,12 @@ func (d *nullDriver) Open(name string) (driver.Conn, error) {
 	return &nullConn{}, nil
 }
 
+// Implement driver.Conn
 type nullConn struct{}
 
 func (c *nullConn) Prepare(query string) (driver.Stmt, error) {
-	return &nullStmt{}, nil
+	inputs := strings.Count(query, "?")
+	return &nullStmt{inputs: inputs}, nil
 }
 
 func (c *nullConn) Close() error {
@@ -32,17 +36,24 @@ func (c *nullConn) Begin() (driver.Tx, error) {
 	return &nullTx{}, nil
 }
 
-type nullStmt struct{}
+// Implement driver.Statement
+type nullStmt struct {
+	inputs int
+}
 
 func (s *nullStmt) Close() error {
 	return nil
 }
 
 func (s *nullStmt) NumInput() int {
-	return 0
+	return s.inputs
 }
 
 func (s *nullStmt) Exec(args []driver.Value) (driver.Result, error) {
+	return &nullResult{}, nil
+}
+
+func (s *nullStmt) StmtExecContext(ctx context.Context, args []driver.NamedValue) (driver.Result, error) {
 	return &nullResult{}, nil
 }
 
@@ -50,6 +61,11 @@ func (s *nullStmt) Query(args []driver.Value) (driver.Rows, error) {
 	return &nullRows{}, nil
 }
 
+func (s *nullStmt) StmtExecQuery(ctx context.Context, args []driver.NamedValue) (driver.Rows, error) {
+	return &nullRows{}, nil
+}
+
+// Implement driver.Tx
 type nullTx struct{}
 
 func (t *nullTx) Commit() error {
@@ -60,6 +76,7 @@ func (t *nullTx) Rollback() error {
 	return nil
 }
 
+// Implement driver.Rows
 type nullRows struct{}
 
 func (r *nullRows) Columns() []string {
@@ -75,6 +92,7 @@ func (r *nullRows) Next(dest []driver.Value) error {
 	return io.EOF
 }
 
+// Implement driver.Result
 type nullResult struct{}
 
 func (r *nullResult) LastInsertId() (int64, error) {
