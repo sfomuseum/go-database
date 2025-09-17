@@ -10,6 +10,7 @@ func TestOpenWithURIEngine(t *testing.T) {
 
 	tests := map[string]string{
 		"sql://mysql/?dsn={...}@tcp(sfomuseum-debug.hdhdhhdjs99.us-east-1.rds.amazonaws.com)/sfomueum_debug&tls=true": "mysql",
+		"sql://null?dsn=null": "null",
 	}
 
 	for db_uri, expected := range tests {
